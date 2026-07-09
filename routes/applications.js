@@ -1,35 +1,61 @@
 const express = require('express');
 const router = express.Router();
+const Application = require('../models/Application');
+const { sendEmail } = require('../utils/mailer');
+const { authenticate, authorize } = require('../middleware/auth');
 
-const applications = [];
-
-router.post('/', (req, res) => {
+// POST a new application
+router.post('/', async (req, res) => {
   const { organizationName, organizationType, contactPerson, email, phone, projectDescription, budget, timeline } = req.body;
 
   if (!organizationName || !organizationType || !contactPerson || !email || !phone || !projectDescription) {
     return res.status(400).json({ error: 'All required fields must be filled' });
   }
 
-  const newApplication = {
-    id: Date.now().toString(),
-    organizationName,
-    organizationType,
-    contactPerson,
-    email,
-    phone,
-    projectDescription,
-    budget: budget || 'Not specified',
-    timeline: timeline || 'Not specified',
-    status: 'pending',
-    createdAt: new Date().toISOString()
-  };
+  try {
+    const newApplication = new Application({
+      organizationName,
+      organizationType,
+      contactPerson,
+      email,
+      phone,
+      projectDescription,
+      budget,
+      timeline,
+    });
 
-  applications.push(newApplication);
-  res.status(201).json({ success: true, message: 'Application submitted successfully', data: newApplication });
+    await newApplication.save();
+
+    // Send email notification
+    const emailHtml = `
+      <h2>New Software Application Received</h2>
+      <p><strong>Organization:</strong> ${organizationName} (${organizationType})</p>
+      <p><strong>Contact Person:</strong> ${contactPerson}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Phone:</strong> ${phone}</p>
+      <p><strong>Project Description:</strong> ${projectDescription}</p>
+      <p><strong>Budget:</strong> ${budget || 'Not specified'}</p>
+      <p><strong>Timeline:</strong> ${timeline || 'Not specified'}</p>
+      <p><br/>Log into the admin dashboard to manage this application.</p>
+    `;
+
+    sendEmail('mutukukennedy5@gmail.com', 'New Application: ' + organizationName, emailHtml).catch(console.error);
+
+    res.status(201).json({ success: true, message: 'Application submitted successfully', data: newApplication });
+  } catch (error) {
+    console.error('Error saving application:', error);
+    res.status(500).json({ error: 'Server error saving application' });
+  }
 });
 
-router.get('/', (req, res) => {
-  res.json({ success: true, data: applications });
+// GET all applications (Admin only)
+router.get('/', authenticate, authorize('admin'), async (req, res) => {
+  try {
+    const applications = await Application.find().sort({ createdAt: -1 });
+    res.json({ success: true, data: applications });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error fetching applications' });
+  }
 });
 
 module.exports = router;
