@@ -5,6 +5,30 @@ const { authenticate, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 
+// GET /api/tickets/search/lookup?number=DOM-XXXX - Organizer: search by ticket number
+// Must be defined BEFORE /:ticketCode to avoid route collision
+router.get('/search/lookup', authenticate, authorize('organizer', 'admin'), async (req, res) => {
+  try {
+    const { number, eventId } = req.query;
+    if (!number) {
+      return res.status(400).json({ success: false, message: 'Ticket number is required' });
+    }
+
+    const query = { ticketNumber: new RegExp(number.toUpperCase(), 'i') };
+
+    const tickets = await Ticket.find(query).limit(10).populate('event', 'title organizer');
+
+    // Only return tickets for events this organizer owns (or admin sees all)
+    const filtered = req.user.role === 'admin'
+      ? tickets
+      : tickets.filter(t => t.event?.organizer?.toString() === req.user._id.toString());
+
+    res.json({ success: true, data: filtered });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // GET /api/tickets - Authenticated: list own tickets
 router.get('/', authenticate, async (req, res) => {
   try {
@@ -143,34 +167,6 @@ router.put('/validate/number/:ticketNumber', authenticate, authorize('organizer'
         attendeeData: ticket.attendeeData,
       },
     });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// GET /api/tickets/search - Organizer: search by ticket number
-router.get('/search/lookup', authenticate, authorize('organizer', 'admin'), async (req, res) => {
-  try {
-    const { number, eventId } = req.query;
-    if (!number) return res.status(400).json({ success: false, message: 'Ticket number required' });
-
-    const query = { ticketNumber: new RegExp(number.toUpperCase(), 'i') };
-    if (eventId) {
-      const event = await Event.findById(eventId);
-      if (event && event.organizer.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-        return res.status(403).json({ success: false, message: 'Not authorized' });
-      }
-      query.event = eventId;
-    }
-
-    const tickets = await Ticket.find(query).limit(10).populate('event', 'title organizer');
-
-    // Filter to only show tickets for organizer's events
-    const filtered = tickets.filter(t =>
-      t.event?.organizer?.toString() === req.user._id.toString() || req.user.role === 'admin'
-    );
-
-    res.json({ success: true, data: filtered });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

@@ -22,7 +22,6 @@ const ticketSchema = new mongoose.Schema({
   usedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, { timestamps: true });
 
-ticketSchema.index({ ticketNumber: 1 });
-ticketSchema.index({ ticketCode: 1 });
+// ticketNumber and ticketCode indexes already defined via unique:true on the fields
 
 module.exports = mongoose.model('Ticket', ticketSchema);

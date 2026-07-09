@@ -71,6 +71,6 @@ const eventSchema = new mongoose.Schema({
 
 eventSchema.index({ status: 1, 'date.start': 1 });
 eventSchema.index({ category: 1, 'venue.city': 1 });
-eventSchema.index({ slug: 1 });
+// slug index already defined via unique:true on the field — no duplicate needed
 
 module.exports = mongoose.model('Event', eventSchema);
