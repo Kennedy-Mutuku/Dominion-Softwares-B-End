@@ -8,21 +8,21 @@ const seedAdmin = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/dominion_softwares');
     
-    const adminEmail = 'dominionsoftwares@gmail.com';
+    const adminEmail = 'admin@dominionsoftwares.org';
     let admin = await User.findOne({ email: adminEmail });
 
     if (!admin) {
       admin = new User({
         name: 'Dominion Admin',
         email: adminEmail,
-        password: '1234',
+        password: 'heavenlyinspired',
         role: 'admin',
         isVerified: true
       });
       await admin.save();
       console.log('Admin user created successfully');
     } else {
-      admin.password = '1234';
+      admin.password = 'heavenlyinspired';
       admin.role = 'admin';
       await admin.save();
       console.log('Admin user updated successfully');

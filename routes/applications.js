@@ -6,7 +6,12 @@ const { authenticate, authorize } = require('../middleware/auth');
 
 // POST a new application
 router.post('/', async (req, res) => {
-  const { organizationName, organizationType, contactPerson, email, phone, projectDescription, budget, timeline } = req.body;
+  const { 
+    clientType, organizationName, organizationType, organizationTypeOther, 
+    contactPerson, email, phone, targetAudience, primaryGoal, 
+    contentManagement, needAccounts, accountTypes, paymentIntegration, 
+    specificFeatures, projectDescription, budget, timeline, additionalNotes 
+  } = req.body;
 
   if (!organizationName || !organizationType || !contactPerson || !email || !phone || !projectDescription) {
     return res.status(400).json({ error: 'All required fields must be filled' });
@@ -14,14 +19,10 @@ router.post('/', async (req, res) => {
 
   try {
     const newApplication = new Application({
-      organizationName,
-      organizationType,
-      contactPerson,
-      email,
-      phone,
-      projectDescription,
-      budget,
-      timeline,
+      clientType, organizationName, organizationType, organizationTypeOther,
+      contactPerson, email, phone, targetAudience, primaryGoal,
+      contentManagement, needAccounts, accountTypes, paymentIntegration,
+      specificFeatures, projectDescription, budget, timeline, additionalNotes
     });
 
     await newApplication.save();
@@ -55,6 +56,27 @@ router.get('/', authenticate, authorize('admin'), async (req, res) => {
     res.json({ success: true, data: applications });
   } catch (error) {
     res.status(500).json({ error: 'Server error fetching applications' });
+  }
+});
+
+// PUT /:id/status (Admin only) - Update application status and feedback
+router.put('/:id/status', authenticate, authorize('admin'), async (req, res) => {
+  try {
+    const { status, adminFeedback } = req.body;
+    const application = await Application.findById(req.params.id);
+    
+    if (!application) {
+      return res.status(404).json({ success: false, message: 'Application not found' });
+    }
+
+    if (status) application.status = status;
+    if (adminFeedback !== undefined) application.adminFeedback = adminFeedback;
+
+    await application.save();
+    res.json({ success: true, data: application });
+  } catch (error) {
+    console.error('Error updating application status:', error);
+    res.status(500).json({ error: 'Server error updating application' });
   }
 });
 
