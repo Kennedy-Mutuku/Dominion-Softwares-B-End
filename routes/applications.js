@@ -62,7 +62,7 @@ router.get('/', authenticate, authorize('admin'), async (req, res) => {
 // PUT /:id/status (Admin only) - Update application status and feedback
 router.put('/:id/status', authenticate, authorize('admin'), async (req, res) => {
   try {
-    const { status, adminFeedback } = req.body;
+    const { status, adminFeedback, deadline } = req.body;
     const application = await Application.findById(req.params.id);
     
     if (!application) {
@@ -71,6 +71,7 @@ router.put('/:id/status', authenticate, authorize('admin'), async (req, res) => 
 
     if (status) application.status = status;
     if (adminFeedback !== undefined) application.adminFeedback = adminFeedback;
+    if (deadline !== undefined) application.deadline = deadline;
 
     await application.save();
     res.json({ success: true, data: application });
