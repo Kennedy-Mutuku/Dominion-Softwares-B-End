@@ -10,7 +10,7 @@ const registrationFieldSchema = new mongoose.Schema({
 
 const ticketTemplateSchema = new mongoose.Schema({
   logo: { type: String },
-  headerColor: { type: String, default: '#E8820C' },
+  headerColor: { type: String, default: '#ff5f00' },
   showFields: [{ type: String }],
   requirePhoto: { type: Boolean, default: false },
   customMessage: { type: String },

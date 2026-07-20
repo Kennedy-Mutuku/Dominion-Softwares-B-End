@@ -6,7 +6,7 @@ dotenv.config();
 
 const seedAdmin = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/dominion_softwares');
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/dominion_softwares');
     
     const adminEmail = 'admin@dominionsoftwares.org';
     let admin = await User.findOne({ email: adminEmail });
