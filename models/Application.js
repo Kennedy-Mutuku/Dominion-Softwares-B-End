@@ -21,7 +21,8 @@ const applicationSchema = new mongoose.Schema({
   deadline: { type: Date },
   additionalNotes: { type: String },
   status: { type: String, enum: ['pending', 'approved', 'feedback', 'contacted', 'closed'], default: 'pending' },
-  adminFeedback: { type: String }
+  adminFeedback: { type: String },
+  clientFeedback: { type: String }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Application', applicationSchema);
