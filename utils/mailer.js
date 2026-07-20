@@ -16,7 +16,7 @@ const initMailer = async () => {
     });
     console.log('Nodemailer test account created:', testAccount.user);
   } catch (err) {
-    console.error('Failed to create test account:', err);
+    console.warn('Mail transporter not initialized (network error or offline). Emails will not be sent.');
   }
 };
 
