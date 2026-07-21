@@ -162,7 +162,10 @@ router.put('/:id/status', authenticate, authorize('admin'), async (req, res) => 
     }
 
     if (status) application.status = status;
-    if (adminFeedback !== undefined) application.adminFeedback = adminFeedback;
+    if (adminFeedback !== undefined && adminFeedback.trim() !== '') {
+      application.adminFeedback = adminFeedback; // Keep for backward compatibility
+      application.messages.push({ sender: 'admin', text: adminFeedback });
+    }
     if (deadline !== undefined) application.deadline = deadline;
 
     await application.save();
@@ -183,7 +186,11 @@ router.put('/:id/feedback', authenticate, authorize('client'), async (req, res) 
       return res.status(404).json({ success: false, message: 'Application not found or not yours' });
     }
 
-    application.clientFeedback = clientFeedback;
+    if (clientFeedback && clientFeedback.trim() !== '') {
+      application.clientFeedback = clientFeedback; // Keep for backward compatibility
+      application.messages.push({ sender: 'client', text: clientFeedback });
+    }
+
     await application.save();
     res.json({ success: true, data: application });
   } catch (error) {

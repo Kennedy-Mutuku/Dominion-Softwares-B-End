@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
+    "predev": "npx kill-port 5000 || true",
     "dev": "node --watch server.js"
   },
   "keywords": [],

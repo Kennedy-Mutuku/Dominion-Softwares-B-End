@@ -22,7 +22,12 @@ const applicationSchema = new mongoose.Schema({
   additionalNotes: { type: String },
   status: { type: String, enum: ['pending', 'approved', 'feedback', 'contacted', 'closed'], default: 'pending' },
   adminFeedback: { type: String },
-  clientFeedback: { type: String }
+  clientFeedback: { type: String },
+  messages: [{
+    sender: { type: String, enum: ['admin', 'client'], required: true },
+    text: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
+  }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Application', applicationSchema);
