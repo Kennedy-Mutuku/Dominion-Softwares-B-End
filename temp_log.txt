@@ -1,0 +1,4 @@
+[dotenv@17.3.1] injecting env (5) from .env -- tip: 🛡️ auth for agents: https://vestauth.com
+Server running on port 5001
+MongoDB connected: 127.0.0.1
+Nodemailer test account created: sttqtizoyoqib4vf@ethereal.email
