@@ -51,7 +51,7 @@ router.post('/', async (req, res) => {
       <p><br/>Log into the admin dashboard to manage this message.</p>
     `;
 
-    sendEmail('mutukukennedy5@gmail.com', `[Contact] ${contactData.subject} from ${name}`, emailHtml).catch(console.error);
+    sendEmail('dominionsoftwares001@gmail.com', `[Contact] ${contactData.subject} from ${name}`, emailHtml).catch(console.error);
 
     res.status(201).json({ success: true, message: 'Message received successfully', data: savedContact });
   } catch (error) {

@@ -8,7 +8,7 @@ const seedAdmin = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/dominion_softwares');
     
-    const adminEmail = 'admin@dominionsoftwares.org';
+    const adminEmail = 'dominionsoftwares001@gmail.com';
     let admin = await User.findOne({ email: adminEmail });
 
     if (!admin) {

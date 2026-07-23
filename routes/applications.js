@@ -128,7 +128,7 @@ router.post('/', async (req, res) => {
       ${attachedFilesHtml}
       <p><br/>Log into the admin dashboard to manage this application.</p>
     `;
-    sendEmail('mutukukennedy5@gmail.com', 'New Application: ' + organizationName, adminEmailHtml).catch(console.error);
+    sendEmail('dominionsoftwares001@gmail.com', 'New Application: ' + organizationName, adminEmailHtml).catch(console.error);
 
     res.status(201).json({ 
       success: true, 
