@@ -29,5 +29,8 @@
     "sharp": "^0.34.5",
     "slugify": "^1.6.8",
     "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^11.2.0"
   }
 }
