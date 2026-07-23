@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const applicationSchema = new mongoose.Schema({
-  clientType: { type: String },
+  clientType: { type: String }, // 'ministry' or 'business'
   organizationName: { type: String, required: true },
   organizationType: { type: String, required: true },
   organizationTypeOther: { type: String },
@@ -11,10 +11,40 @@ const applicationSchema = new mongoose.Schema({
   targetAudience: { type: String },
   primaryGoal: { type: String },
   contentManagement: { type: String },
+  selectedFeatures: [{ type: String }],
+  
+  // Category A: Design & Layout Inspirations (Scope Discovery)
+  designInspirations: {
+    images: [{
+      url: { type: String },
+      filename: { type: String }
+    }],
+    videoUrl: { type: String }
+  },
+
+  // Category B: Ready-to-Use Brand Assets (Production Content)
+  brandAssets: {
+    files: [{
+      url: { type: String },
+      filename: { type: String },
+      fileType: { type: String }
+    }],
+    externalDriveUrl: { type: String }
+  },
+
   needAccounts: { type: String },
   accountTypes: [{ type: String }],
   paymentIntegration: { type: String },
   specificFeatures: { type: String },
+  
+  // Requirements Engineering Guidance (NFRs)
+  nfr: {
+    expectedUserCapacity: { type: String },
+    securityRequirements: [{ type: String }],
+    thirdPartyIntegrations: [{ type: String }],
+    additionalNfrNotes: { type: String }
+  },
+
   projectDescription: { type: String, required: true },
   budget: { type: String, default: 'Not specified' },
   timeline: { type: String, default: 'Not specified' },

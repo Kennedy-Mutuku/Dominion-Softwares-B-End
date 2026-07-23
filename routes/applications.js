@@ -10,7 +10,8 @@ router.post('/', async (req, res) => {
   const { 
     clientType, organizationName, organizationType, organizationTypeOther, 
     contactPerson, email, phone, targetAudience, primaryGoal, 
-    contentManagement, needAccounts, accountTypes, paymentIntegration, 
+    contentManagement, selectedFeatures, designInspirations, brandAssets,
+    needAccounts, accountTypes, paymentIntegration, nfr,
     specificFeatures, projectDescription, budget, timeline, additionalNotes 
   } = req.body;
 
@@ -22,7 +23,8 @@ router.post('/', async (req, res) => {
     const newApplication = new Application({
       clientType, organizationName, organizationType, organizationTypeOther,
       contactPerson, email, phone, targetAudience, primaryGoal,
-      contentManagement, needAccounts, accountTypes, paymentIntegration,
+      contentManagement, selectedFeatures, designInspirations, brandAssets,
+      needAccounts, accountTypes, paymentIntegration, nfr,
       specificFeatures, projectDescription, budget, timeline, additionalNotes
     });
 
@@ -52,14 +54,14 @@ router.post('/', async (req, res) => {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: #1B1B1B; padding: 24px; border-radius: 12px 12px 0 0;">
           <h1 style="color: #F97316; margin: 0; font-size: 22px;">Dominion Softwares Ltd</h1>
-          <p style="color: #aaa; margin: 4px 0 0 0; font-size: 13px;">Software Development Application Received</p>
+          <p style="color: #aaa; margin: 4px 0 0 0; font-size: 13px;">Software Requirements Specification (SRS) Intake Received</p>
         </div>
         <div style="background: #fff; padding: 32px; border: 1px solid #eee; border-top: none; border-radius: 0 0 12px 12px;">
           <p style="color: #333;">Dear <strong>${contactPerson}</strong>,</p>
           <p style="color: #555; line-height: 1.6;">
-            Thank you for choosing Dominion Softwares Ltd! We have received your project application for 
-            <strong>${organizationName}</strong>. Our team will carefully review your requirements and get back to you 
-            within <strong>24–48 hours</strong>.
+            Thank you for choosing Dominion Softwares Ltd! We have received your detailed project requirements for 
+            <strong>${organizationName}</strong>. Our team will review your specifications and get back to you 
+            within <strong>24–48 hours</strong> with a customized proposal.
           </p>
 
           <div style="background: #FFF7ED; border: 1px solid #FDBA74; border-radius: 10px; padding: 20px; margin: 24px 0;">
@@ -91,6 +93,7 @@ router.post('/', async (req, res) => {
           <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;" />
           <h4 style="color: #333; margin-bottom: 12px;">Your Application Summary</h4>
           <p style="margin: 4px 0; color: #555; font-size: 13px;"><strong>Organization:</strong> ${organizationName} (${organizationType})</p>
+          <p style="margin: 4px 0; color: #555; font-size: 13px;"><strong>Primary Goal:</strong> ${primaryGoal || 'Not specified'}</p>
           <p style="margin: 4px 0; color: #555; font-size: 13px;"><strong>Budget:</strong> ${budget || 'Not specified'}</p>
           <p style="margin: 4px 0; color: #555; font-size: 13px;"><strong>Timeline:</strong> ${timeline || 'Not specified'}</p>
           <p style="margin: 16px 0 0 0; color: #888; font-size: 12px;">
@@ -104,18 +107,22 @@ router.post('/', async (req, res) => {
     // Send email to the applicant with credentials
     sendEmail(email, `Application Received + Your Login Credentials — ${organizationName}`, applicantEmailHtml).catch(console.error);
 
-    // Notify admin
+    // Notify admin with SRS breakdown
     const adminEmailHtml = `
-      <h2>New Software Application Received</h2>
+      <h2>New Software Intake Application Received</h2>
       <p><strong>Organization:</strong> ${organizationName} (${organizationType})</p>
+      <p><strong>Category:</strong> ${clientType === 'ministry' ? 'Church / Ministry (Kingdom)' : 'Business / Commercial'}</p>
       <p><strong>Contact Person:</strong> ${contactPerson}</p>
       <p><strong>Email:</strong> ${email}</p>
       <p><strong>Phone:</strong> ${phone}</p>
       <p><strong>Project Description:</strong> ${projectDescription}</p>
+      <p><strong>Selected Features:</strong> ${selectedFeatures && selectedFeatures.length ? selectedFeatures.join(', ') : 'None'}</p>
+      <p><strong>Expected User Capacity:</strong> ${nfr?.expectedUserCapacity || 'Not specified'}</p>
+      <p><strong>Security Needs:</strong> ${nfr?.securityRequirements?.length ? nfr.securityRequirements.join(', ') : 'Default'}</p>
+      <p><strong>Integrations:</strong> ${nfr?.thirdPartyIntegrations?.length ? nfr.thirdPartyIntegrations.join(', ') : 'None'}</p>
       <p><strong>Budget:</strong> ${budget || 'Not specified'}</p>
       <p><strong>Timeline:</strong> ${timeline || 'Not specified'}</p>
-      <p><strong>Client Account Created:</strong> ${clientAccountCreated ? 'Yes (new user created)' : 'No (existing user)'}</p>
-      <p><br/>Log into the admin dashboard to manage this application.</p>
+      <p><br/>Log into the admin dashboard to view full SRS media attachments and details.</p>
     `;
     sendEmail('mutukukennedy5@gmail.com', 'New Application: ' + organizationName, adminEmailHtml).catch(console.error);
 
