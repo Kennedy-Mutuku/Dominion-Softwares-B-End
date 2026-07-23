@@ -11,7 +11,8 @@ router.post('/', async (req, res) => {
     clientType, organizationName, organizationType, organizationTypeOther, 
     contactPerson, email, phone, targetAudience, primaryGoal, 
     contentManagement, needAccounts, accountTypes, paymentIntegration, 
-    specificFeatures, projectDescription, budget, timeline, additionalNotes 
+    specificFeatures, projectDescription, budget, timeline, additionalNotes,
+    attachedFiles
   } = req.body;
 
   if (!organizationName || !organizationType || !contactPerson || !email || !phone || !projectDescription) {
@@ -23,7 +24,8 @@ router.post('/', async (req, res) => {
       clientType, organizationName, organizationType, organizationTypeOther,
       contactPerson, email, phone, targetAudience, primaryGoal,
       contentManagement, needAccounts, accountTypes, paymentIntegration,
-      specificFeatures, projectDescription, budget, timeline, additionalNotes
+      specificFeatures, projectDescription, budget, timeline, additionalNotes,
+      attachedFiles
     });
 
     await newApplication.save();
@@ -46,7 +48,14 @@ router.post('/', async (req, res) => {
 
     // Build email HTML for the applicant
     const loginUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/login`;
-    const portalUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/client-portal`;
+    const attachedFilesHtml = attachedFiles && attachedFiles.length > 0 
+      ? `<div style="background: #FFF7ED; border: 1px solid #FED7AA; border-radius: 8px; padding: 12px; margin-top: 16px;">
+          <h4 style="margin: 0 0 8px 0; color: #C2410C; font-size: 14px;">📎 Attached Media & Production Assets (${attachedFiles.length}):</h4>
+          <ul style="margin: 0; padding-left: 20px; color: #4B5563; font-size: 13px;">
+            ${attachedFiles.map(f => `<li><strong>${f.name}</strong> — <em>${f.category || 'General'}</em></li>`).join('')}
+          </ul>
+        </div>`
+      : '';
 
     const applicantEmailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -58,7 +67,7 @@ router.post('/', async (req, res) => {
           <p style="color: #333;">Dear <strong>${contactPerson}</strong>,</p>
           <p style="color: #555; line-height: 1.6;">
             Thank you for choosing Dominion Softwares Ltd! We have received your project application for 
-            <strong>${organizationName}</strong>. Our team will carefully review your requirements and get back to you 
+            <strong>${organizationName}</strong>. Our team will carefully review your requirements and attached media files, then get back to you 
             within <strong>24–48 hours</strong>.
           </p>
 
@@ -93,6 +102,7 @@ router.post('/', async (req, res) => {
           <p style="margin: 4px 0; color: #555; font-size: 13px;"><strong>Organization:</strong> ${organizationName} (${organizationType})</p>
           <p style="margin: 4px 0; color: #555; font-size: 13px;"><strong>Budget:</strong> ${budget || 'Not specified'}</p>
           <p style="margin: 4px 0; color: #555; font-size: 13px;"><strong>Timeline:</strong> ${timeline || 'Not specified'}</p>
+          ${attachedFilesHtml}
           <p style="margin: 16px 0 0 0; color: #888; font-size: 12px;">
             If you have any immediate questions, feel free to reach out to us directly.<br/>
             — The Dominion Softwares Team
@@ -101,7 +111,7 @@ router.post('/', async (req, res) => {
       </div>
     `;
 
-    // Send email to the applicant with credentials
+    // Send email to applicant
     sendEmail(email, `Application Received + Your Login Credentials — ${organizationName}`, applicantEmailHtml).catch(console.error);
 
     // Notify admin
@@ -115,6 +125,7 @@ router.post('/', async (req, res) => {
       <p><strong>Budget:</strong> ${budget || 'Not specified'}</p>
       <p><strong>Timeline:</strong> ${timeline || 'Not specified'}</p>
       <p><strong>Client Account Created:</strong> ${clientAccountCreated ? 'Yes (new user created)' : 'No (existing user)'}</p>
+      ${attachedFilesHtml}
       <p><br/>Log into the admin dashboard to manage this application.</p>
     `;
     sendEmail('mutukukennedy5@gmail.com', 'New Application: ' + organizationName, adminEmailHtml).catch(console.error);

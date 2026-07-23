@@ -20,6 +20,15 @@ const applicationSchema = new mongoose.Schema({
   timeline: { type: String, default: 'Not specified' },
   deadline: { type: Date },
   additionalNotes: { type: String },
+  attachedFiles: [{
+    id: { type: String },
+    name: { type: String },
+    type: { type: String },
+    size: { type: Number },
+    category: { type: String },
+    url: { type: String },
+    uploadedAt: { type: String }
+  }],
   status: { type: String, enum: ['pending', 'approved', 'feedback', 'contacted', 'closed'], default: 'pending' },
   adminFeedback: { type: String },
   clientFeedback: { type: String },
